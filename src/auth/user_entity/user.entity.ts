@@ -16,4 +16,7 @@ export class UserEntity {
 
 	@Column({ default: new Date() })
 	createdAt: Date;
+
+	@Column({ default: false })
+	readonly isAdmin: boolean;
 }
