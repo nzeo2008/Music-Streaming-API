@@ -11,7 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 export class AuthService {
 	constructor(
 		@InjectRepository(UserEntity)
-		private readonly userRepository: Repository<AuthDTO>,
+		private readonly userRepository: Repository<UserEntity>,
 		private readonly jwtService: JwtService,
 	) {}
 
@@ -26,16 +26,27 @@ export class AuthService {
 
 	async login(dto: AuthDTO) {
 		const { email } = dto;
-		const foundUser = await this.userRepository.findOne({
+		const foundUser = (await this.userRepository.findOne({
 			where: { email },
-		});
+		})) as UserEntity;
 		if (!foundUser) return null;
 		const isValidPasword = await this.validateUser(
 			dto.password,
 			foundUser.password,
 		);
 		if (!isValidPasword) return null;
-		return { access_token: await this.jwtService.signAsync({ foundUser }) };
+		if (foundUser.isAdmin) {
+			const { password, ...updatedUser } = foundUser;
+			return {
+				access_token: await this.jwtService.signAsync({
+					...updatedUser,
+				}),
+			};
+		}
+		const { password, isAdmin, ...updatedUser } = foundUser;
+		return {
+			access_token: await this.jwtService.signAsync({ ...updatedUser }),
+		};
 	}
 
 	private async generatePassword(password: string) {
