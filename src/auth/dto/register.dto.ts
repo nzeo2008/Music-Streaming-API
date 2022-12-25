@@ -1,6 +1,11 @@
 import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
 
-export class AuthDTO {
+export class RegisterDTO {
+	@MaxLength(12)
+	@MinLength(2)
+	@IsString()
+	readonly name: string;
+
 	@IsEmail()
 	@MinLength(2)
 	@MaxLength(20)
