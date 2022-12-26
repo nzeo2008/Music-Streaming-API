@@ -13,7 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 		});
 	}
-	async validate({ isAdmin }: Pick<UserEntity, 'isAdmin'>) {
-		return isAdmin;
+	async validate(payload: Pick<UserEntity, 'isAdmin'>) {
+		return payload?.isAdmin;
 	}
 }
